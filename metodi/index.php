@@ -8,6 +8,7 @@
 
     $conn = mysqli_connect($servername, $username, $password, $database);
     $tabelle = array("prodotti", "case_produttrici", "dispositivi", "sedi");
+    $campi_primari = array("Numero_Serie", "Nome", "Id", "Id");
 
     // Verifica della connessione
     if (!$conn) {
@@ -17,11 +18,11 @@
     // echo $_SERVER['REQUEST_URI'];
 
     $array = explode('/',$_SERVER['REQUEST_URI']);
-    // echo "<br>";
-    // foreach ($array as $a) 
-    // {
-    //     echo $a . "<br>";
-    // } 
+    echo "<br>";
+    foreach ($array as $a) 
+    {
+        echo $a . "<br>";
+    } 
     switch ($_SERVER['REQUEST_METHOD']) 
     {
         case "GET":
@@ -79,8 +80,33 @@
                 }
             }
             break;
-        case "POST":
-            echo "Today is Tuesday";
+        case "POST":  
+            //POST RECORD
+            if (count($array) == 5 && $array[4] != '' && $array[3] != '')
+            {
+                $id = $array[4];
+                $tab;
+                $pos = 0;
+                foreach ($tabelle as $t) 
+                {
+                    if($t == $array[3])
+                    {
+                        $tab = $t;
+                        break;
+                    }
+                    $pos++;
+                } 
+                $sql = "SELECT * FROM $tab WHERE $campi_primari[$pos] == $id";
+                $result = mysqli_query($conn, $sql);
+                
+                if (mysqli_num_rows($result) > 0)  
+                {
+                    echo "Valore esistente";
+                } else 
+                {
+                    echo "Nessun risultato trovato con Id $id";
+                }
+            }
             break;
         case "DELETE":
             echo "Today is Wednesday";
@@ -94,3 +120,5 @@
     $conn->close();
 
 ?>
+
+<!-- curl -v -H "Content-Type: application/json" -X POST \ -d '{"name":"your name","phonenumber":"111-111"}' http://www.example.com/details -->
