@@ -19,13 +19,13 @@
 
     $array = explode('/',$_SERVER['REQUEST_URI']);
     
-    /*
+    
     echo "<br>";
     foreach ($array as $a) 
     {
         echo $a . "<br>";
     }   
-    */          
+            
 
     $response = "";
     $code = 404;
@@ -43,16 +43,16 @@
                     {
                         $sql = "SELECT * FROM $t";
                         $result = mysqli_query($conn, $sql);
-        
+                        $response1 = "";
                         if (mysqli_num_rows($result) > 0)  
                         {
-                            $response = "[";
+                            $response .= "[";
 
                             if ($result->num_rows > 0) {
                                 while ($row = $result->fetch_assoc()) {
-                                    $response .= json_encode($row) . ",";
+                                    $response1 .= json_encode($row) . ",";
                                 }
-                                $response = rtrim($response, ",");
+                                $response .= rtrim($response1, ",");
                             }
                             $response .= "]";
                         } 
@@ -209,14 +209,10 @@
                         
                         if (mysqli_num_rows($result) > 0)  
                         {
-                            $valori = array();
                             $query = "";
-                            foreach ($campi as $campo) {
-                                array_push($valori, );
-                            }   
                             $cont = 0;
                             foreach ($valori as $valore) {
-                                $query += $campi[cont] . '=' . $valore . ','
+                                $query += $campi[cont] . '=' . $valore . ',';
                             }
                             $query = rtrim($query, ",");
                             $sql = "UPDATE $tab
