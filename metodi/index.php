@@ -35,31 +35,8 @@
         switch ($_SERVER['REQUEST_METHOD']) 
         {
             case "GET":
-                //GET ALL
-                if (count($array) == 4 && $array[3] == '')
-                {
-                    $sql = "";
-                    foreach ($tabelle as $t) 
-                    {
-                        $sql = "SELECT * FROM $t";
-                        $result = mysqli_query($conn, $sql);
-                        $response1 = "";
-                        if (mysqli_num_rows($result) > 0)  
-                        {
-                            $response .= "[";
-
-                            if ($result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    $response1 .= json_encode($row) . ",";
-                                }
-                                $response .= rtrim($response1, ",");
-                            }
-                            $response .= "]";
-                        } 
-                    } 
-                }
                 //GET TABELLA
-                else if(count($array) == 4 && $array[3] != '')
+                if(count($array) == 4 && $array[3] != '')
                 {
                     $sql = "SELECT * FROM $array[3]";
                     $result = mysqli_query($conn, $sql);
