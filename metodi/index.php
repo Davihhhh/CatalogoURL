@@ -19,13 +19,12 @@
 
     $array = explode('/',$_SERVER['REQUEST_URI']);
     
-    
-    echo "<br>";
+    /*
     foreach ($array as $a) 
     {
         echo $a . "<br>";
-    }   
-            
+    }
+    */
 
     $response = "";
     $code = 404;
@@ -36,14 +35,15 @@
         {
             case "GET":
                 //GET TABELLA
-                if(count($array) == 4 && $array[3] != '')
+                if(count($array) == 3 && $array[2] != '')
                 {
-                    $sql = "SELECT * FROM $array[3]";
+                    $tab = $array[2];
+                    $sql = "SELECT * FROM $tab";
                     $result = mysqli_query($conn, $sql);
-                
+
                     if (mysqli_num_rows($result) > 0)  
                     {
-                        $response = "[";
+                        $response .= "[";
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
@@ -52,13 +52,19 @@
                             $response = rtrim($response, ",");
                         }
                         $response .= "]";
+                        $code = 200;
                     } 
+                    else {
+                        $code = 404;
+                        $response = "Nessun risultato";
+                    }
                 }
                 //GET VALORE
-                else if (count($array) == 5 && $array[4] != '' && $array[3] != '')
+                else if (count($array) == 4 && $array[3] != '' && $array[2] != '')
                 {
-                    $id = $array[4];
-                    $sql = "SELECT * FROM $array[3] WHERE Id = $id";
+                    $tab = $array[2];
+                    $id = $array[3];
+                    $sql = "SELECT * FROM $tab WHERE Id = $id";
                     
                     $result = mysqli_query($conn, $sql);
         
@@ -66,6 +72,11 @@
                     {
                         $row = $result->fetch_assoc();
                         $response = json_encode($row);
+                        $code = 200;
+                    }
+                    else {
+                        $code = 404;
+                        $response = "Nessun risultato";
                     }
                 }
                 break;
@@ -128,8 +139,9 @@
                 //DELETE RECORD
                 if (count($array) == 5 && $array[4] != '' && $array[3] != '')
                 {
+                    $tab = $array[3];
                     $id = $array[4];
-                    $sql = "SELECT * FROM $array[3] WHERE Id = $id";
+                    $sql = "SELECT * FROM $tab WHERE Id = '$id'";
                     
                     $result = mysqli_query($conn, $sql);
         
@@ -137,15 +149,14 @@
                     {
                         $row = $result->fetch_assoc();
                         $response = json_encode($row);
-                    }
-                    $sql = "DELETE FROM nome_tabella WHERE id = '$record_id'";
-
-                    if ($conn->query($sql) === TRUE) 
+                        $sql = "DELETE FROM $tab WHERE Id = '$id'";
+                        if ($conn->query($sql) === TRUE) 
                     {
-                        $response = "Record eliminato con successo dal database";
+                        $response = "Record eliminato con successo";
                     } else 
                     {
                         $response = "Errore durante l'eliminazione del record: " . $conn->error;
+                    }
                     }
                 }
                 break;
@@ -203,8 +214,19 @@
                         }
                     }
                 }
+                else 
+                    break;
+            case "OPTIONS":
+                header("Access-Control-Allow-Origin: *");
+                header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+                header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+
+                $response = "Richiesta approvata";
+                $code = 200;
+                break;
             default:
                 $code = 405;
+                break;
         }
         if($response == "")
         {
@@ -219,5 +241,5 @@
       
     $conn->close();
 
-    //curl -v -H "Content-Type: application/json" -X POST \ -d '{"name":"your name","phonenumber":"111-111"}' localhost/metodi/index.php/
+    //curl -v -H "Content-Type: application/json" -X GET localhost/metodi/
 ?>
